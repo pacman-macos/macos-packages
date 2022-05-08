@@ -1,0 +1,38 @@
+pkgname=pkgconf
+pkgver=1.8.0
+pkgrel=1
+pkgdesc="Package compiler and linker metadata toolklit"
+url="https://github.com/pkgconf/pkgconf"
+license=(custom:ISC)
+arch=(x86_64)
+provides=(pkg-config pkgconfig libpkgconf.dylib)
+groups=(base-devel)
+source=("https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-1.8.0.tar.gz")
+sha256sums=("d84a2a338a17e0f68e6a8d6c9caf40d6a2c9580c4ae1d475b338b8d956e483aa")
+
+prepare() {
+  cd $pkgname-$pkgname-$pkgver
+}
+
+build() {
+  [[ -d ${srcdir}/build ]] && rm -rf ${srcdir}/build
+  mkdir ${srcdir}/build
+  cd ${srcdir}/build
+
+  meson --prefix=/usr/local \
+    --buildtype=plain \
+    -Dtests=false \
+    ../$pkgname-$pkgname-$pkgver
+
+  meson compile
+}
+
+package() {
+  cd ${srcdir}/build
+
+  DESTDIR="${pkgdir}" meson install
+
+  cp "${pkgdir}"/usr/local/bin/pkgconf "${pkgdir}"/usr/local/bin/pkg-config
+  cp "${pkgdir}"/usr/local/bin/pkgconf "${pkgdir}"/usr/local/bin/x86_64-apple-darwin21.4.0-pkgconf
+  cp "${pkgdir}"/usr/local/bin/pkg-config "${pkgdir}"/usr/local/bin/x86_64-apple-darwin21.4.0-pkg-config
+}
